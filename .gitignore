@@ -29,3 +29,5 @@ vignettes/*.pdf
 .Rbuildignore
 
 .DS_Store
+/doc/
+/Meta/

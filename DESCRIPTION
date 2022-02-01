@@ -6,11 +6,18 @@ Authors@R: c(person('Cory','Merow',email='cory.merow@gmail.com',role=c('aut','cr
 Description: Identify outlying species occurrence records (e.g., in species distribution
     modeling applications) using statistical tests. Outliers can be identified in 
     geographic or environmental space. Outliers are flagged and visualized so that 
-    users can consider how best to handle.
+    users can consider how best to handle them.
 License: GPL-3
 Encoding: UTF-8
 Depends: 
-    R (>= 3.4.0)
-LazyData: true
+    R (>= 3.5.0)
 Imports: 
-  outliers
+  EnvStats,
+  graphics,
+  knitr,
+  outliers,
+  raster,
+  sp,
+  stats
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr
