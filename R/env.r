@@ -11,8 +11,8 @@
 #' @param pres a `SpatialPoints` or `SpatialPointsDataFrame` object describing the locations of species records. A `SpatialPointsDataFrame` containing the values of environmental variables to be used must be supplied if `envOutliers=TRUE`
 #' @param method character; options are 'iqr', 'grubbs', 'dixon', 'rosner'
 #' @param pvalSet user-specified p-value for assessing the significance of Grubbs test statistic.
-#' @param checkPairs logical; check for a single pair of outliers. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye.
-# @keywords
+#' @param checkPairs logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye. The value has no effect unless `method='grubbs'`.
+#' @param kRosner integer between 1 and 10. Determines the number of outliers suspected with a Rosner test. The value has no effect unless `method='rosner'`.# @keywords
 #' @export
 #'
 #' @examples

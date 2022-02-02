@@ -9,7 +9,8 @@
 #' @param pres a `SpatialPoints` or `SpatialPointsDataFrame` object describing the locations of species records. A `SpatialPointsDataFrame` containing the values of environmental variables to be used must be supplied if `envOutliers=TRUE`
 #' @param method character; options are 'iqr', 'grubbs', 'dixon', 'rosner'
 #' @param pvalSet user-specified p-value for assessing the significance of Grubbs test statistic.
-#' @param checkPairs logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye.
+#' @param checkPairs logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye. The value has no effect unless `method='grubbs'`.
+#' @param kRosner integer between 1 and 10. Determines the number of outliers suspected with a Rosner test. The value has no effect unless `method='rosner'`.
 # @keywords
 #' @export
 #'
@@ -33,19 +34,21 @@
 findSpatialOutliers=function(pres,
                              pvalSet=1e-5,
                              method='grubbs',
-                             checkPairs=TRUE){
+                             checkPairs=TRUE,
+                             kRosner=NULL){
   #  for testing
   #  pvalSet=1e-5
   #  pres=mcp.pres; pvalSet=1e-5; checkPairs=T
   
   pres.inliers=pres
   sp.toss.coord=NULL
+  dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
+  sp.toss.id=NULL
   
   if(any(method=='grubbs')){
     pval=0
     #toss singles
     while(pval<pvalSet){
-    	dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
       gt=outliers::grubbs.test(dists)
       #gt=dixon.test(dists)
     	#cot=chisq.out.test(dists,variance = var(dists),opposite = FALSE)
@@ -65,7 +68,6 @@ findSpatialOutliers=function(pres,
   			pval=0
   			# By turning off this loop, I'm ensuring that you can only toss 1 pair of outliers. with the loop, it tends to find lots of supposed outliers very confidently, but by eye, it tends to omit clusters
   			#while(pval<pvalSet){
-  				dists=.presPercentile(pres.inliers, percent=NULL)[[1]]$dist.from.centroid
   				gt=outliers::grubbs.test(dists,type=20)
   
   				#gt=dixon.test(dists)
@@ -84,24 +86,22 @@ findSpatialOutliers=function(pres,
     if(!is.null(sp.toss.coord)){
       coor=sp::coordinates(pres)
       sp.toss.id= apply(sp.toss.coord,1,function(x) which(x[1]==coor[,1] & x[2]==coor[,2]))
-    } else {sp.toss.id=NULL}
+    } 
   } # end grubbs
   
-  if(any(method=='iqr')){
-    dists=.presPercentile(pres.inliers, percent=NULL)[[1]]$dist.from.centroid
-    sp.toss.id=.iqrOutlier(dists)
-  }
+  if(any(method=='iqr')) sp.toss.id=.iqrOutlier(dists)
   
   if(any(method=='dixon')){
-    
+    # why don't i have to set the p-value for this?
+    dt=outliers::dixon.test(dists2,type=0,two.sided = FALSE)
+    #cot=chisq.out.test(dists,variance = var(dists),opposite = FALSE)
+    if(dt$p.value<pvalSet) sp.toss.id=which.max(dists)
   }
   
   if(any(method=='rosner')){
-    
+    rt=EnvStats::rosnerTest(dists,kRosner,alpha=pvalSet)
+    if(any(rt$all.stats$Outlier)) sp.toss.id=utils::tail(order(dists),kRosner)
   }
-  
-
-  
   
   sp.toss.id
 }

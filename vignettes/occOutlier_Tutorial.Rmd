@@ -29,7 +29,6 @@ mc.cores=1
 ```{r}
 library(occOutliers)
 library(sp)
-library(rprojroot)
 ```
 
 
@@ -50,12 +49,29 @@ world.shp=readRDS(system.file('extdata/worldShpMollwide.rds',package='occOutlier
 plotOutliers(presOut,shpToPlot = world.shp)
 ```
 
+Using the IQR test
 ```{r}
 presOut=findOutlyingPoints(pres=myPresDF,
                            spOutliers=TRUE,
                            envOutliers = FALSE,
                            method='iqr')
-world.shp=readRDS(system.file('extdata/worldShpMollwide.rds',package='occOutliers'))
+plotOutliers(presOut,shpToPlot = world.shp,outlierNames = 'spOutlier')
+```
+Using dixon
+```{r}
+presOut=findOutlyingPoints(pres=myPresDF,
+                           spOutliers=TRUE,
+                           envOutliers = FALSE,
+                           method='dixon')
+plotOutliers(presOut,shpToPlot = world.shp,outlierNames = 'spOutlier')
+```
+Using Rosner
+```{r}
+presOut=findOutlyingPoints(pres=myPresDF,
+                           spOutliers=TRUE,
+                           envOutliers = FALSE,
+                           method='rosner',
+                           kRosner=3)
 plotOutliers(presOut,shpToPlot = world.shp,outlierNames = 'spOutlier')
 ```
 

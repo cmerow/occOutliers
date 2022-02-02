@@ -10,7 +10,8 @@
 #' @param envOutliers logical; perform environmental outlier analysis
 #' @param method character; options are 'iqr', 'grubbs', 'dixon', 'rosner'
 #' @param pval user-specified p-value for assessing the significance of Grubbs test statistic.
-#' @param checkPairs logical; check for a single pair of outliers. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye.
+#' @param checkPairs logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye. The value has no effect unless `method='grubbs'`.
+#' @param kRosner integer between 1 and 10. Determines the number of outliers suspected with a Rosner test. The value has no effect unless `method='rosner'`.
 #' @param verbose logical; print messages
 # @keywords
 #' @export
@@ -47,6 +48,7 @@ findOutlyingPoints=function(pres,
                             method='grubbs',
                             pval=1e-5,
                             checkPairs=TRUE,
+                            kRosner=3,
                             verbose=TRUE){
 
   #  for testing
@@ -57,12 +59,14 @@ findOutlyingPoints=function(pres,
   if(!any(class(pres)==c('SpatialPoints','SpatialPointsDataFrame'))) stop('Please make your presence data a SpatialPoints or SpatialPointsDataFrame object and try again')
   
   if(spOutliers) { 
-  	sp.toss.id=findSpatialOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,method=method)
+  	sp.toss.id=findSpatialOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,
+  	                               method=method,kRosner=kRosner)
   	if(verbose) print(paste0(length(sp.toss.id),' geographic outlier(s) found'))
   } else {sp.toss.id=NULL}
   
   if(envOutliers) { 
-  	env.toss.id=findEnvOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,method=method)
+  	env.toss.id=findEnvOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,
+  	                            method=method,kRosner=kRosner)
   	pres$envOutlier=FALSE
   	pres$envOutlier[env.toss.id]=TRUE
   	if(verbose) print(paste0(length(env.toss.id),' environmental outlier(s) found'))
