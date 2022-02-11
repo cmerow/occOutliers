@@ -8,7 +8,7 @@
 #' @param pres a `SpatialPoints` or `SpatialPointsDataFrame` object describing the locations of species records. A `SpatialPointsDataFrame` containing the values of environmental variables to be used must be supplied if `envOutliers=TRUE`
 #' @param spOutliers logical; perform spatial outlier analysis
 #' @param envOutliers logical; perform environmental outlier analysis
-#' @param method character; options are 'iqr', 'grubbs', 'dixon', 'rosner'
+#' @param method character; options are 'iqr', 'grubbs', 'dixon', 'rosner'. Only a single value can be used; if mutliple tests are desired, call `findOuliers` multiple times specifying different methods.
 #' @param pval user-specified p-value for assessing the significance of Grubbs test statistic.
 #' @param checkPairs logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye. The value has no effect unless `method='grubbs'`.
 #' @param kRosner integer between 1 and 10. Determines the number of outliers suspected with a Rosner test. The value has no effect unless `method='rosner'`.
@@ -52,16 +52,15 @@ findOutlyingPoints=function(pres,
                             verbose=TRUE){
 
   #  for testing
-  #  pres=myPresDF; env=myEnv; verbose=T
-  #  envOutliers=T; spOutliers=T; doPlot=T; plotFile=NULL; pval=1e-5; envVar=names(env)
-  # #plotFile=paste0(dirs$sp.diag.path, '/', species,'__OccurrenceOutliers.png')
+  #  pres=myPresDF;  verbose=T
+  #  envOutliers=T; spOutliers=T;  pval=1e-5; 
 
   if(!any(class(pres)==c('SpatialPoints','SpatialPointsDataFrame'))) stop('Please make your presence data a SpatialPoints or SpatialPointsDataFrame object and try again')
   
   if(spOutliers) { 
   	sp.toss.id=findSpatialOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,
   	                               method=method,kRosner=kRosner)
-  	if(verbose) print(paste0(length(sp.toss.id),' geographic outlier(s) found'))
+  	if(verbose) print(paste0(length(sp.toss.id),' geographic outlier(s) found with method ',method))
   } else {sp.toss.id=NULL}
   
   if(envOutliers) { 
@@ -69,7 +68,7 @@ findOutlyingPoints=function(pres,
   	                            method=method,kRosner=kRosner)
   	pres$envOutlier=FALSE
   	pres$envOutlier[env.toss.id]=TRUE
-  	if(verbose) print(paste0(length(env.toss.id),' environmental outlier(s) found'))
+  	if(verbose) print(paste0(length(env.toss.id),' environmental outlier(s) found with method ',method))
   	if(nrow(pres)-length(env.toss.id) < 2){
   		warning(paste0('pretty much all the presences came up as environmental outliers. The only case Ive seen this in was when there were two obvious outliers and all the other presences had the same exact environment. In any case, I cant find any outliers.'))
   	}

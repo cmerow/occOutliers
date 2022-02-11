@@ -37,35 +37,44 @@ findSpatialOutliers=function(pres,
                              checkPairs=TRUE,
                              kRosner=NULL){
   #  for testing
-  #  pvalSet=1e-5
-  #  pres=mcp.pres; pvalSet=1e-5; checkPairs=T
+  #   pvalSet=1e-5; checkPairs=T
   
   pres.inliers=pres
   sp.toss.coord=NULL
-  dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
   sp.toss.id=NULL
   
   if(any(method=='grubbs')){
     pval=0
+    #tmp.dists=dists
     #toss singles
-    while(pval<pvalSet){
+    while(pval<pvalSet & length(pres.inliers)>3){
+    	# i want to recompute the distances once an outlier is removed because the outlier biased the centroid of the group, which influences distances
+      dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
       gt=outliers::grubbs.test(dists)
       #gt=dixon.test(dists)
     	#cot=chisq.out.test(dists,variance = var(dists),opposite = FALSE)
       (pval=gt$p.value)
       # conservative way to toss outliers. this checks whether the single largest distance is an outlier. this is repeated until no more outliers are found
+      if(is.na(pval)) {
+      	warning('p-value for grubbs test was NA. sample size is too small to implement the test')
+      	break
+      }
       if(gt$p.value<pvalSet){
         toss=which.max(dists)
         # IDs in the original data frame
         sp.toss.coord=rbind(sp.toss.coord,sp::coordinates(pres.inliers)[toss,])
         pres.inliers=pres.inliers[-toss,]
-        dists=dists[-toss]
+        #tmp.dists=tmp.dists[-toss]
       }
     }
+    if(length(dists)<3) warning('All but two records were deemed outliers. The Grubbs test may not be appropriate for these data.')
     # toss pairs
     if(checkPairs){
-    	if(length(pres.inliers)<31){
+    	if(length(pres.inliers)<31 & length(pres.inliers)>3){
   			pval=0
+  			#tmp.dists=dists
+      	dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
+
   			# By turning off this loop, I'm ensuring that you can only toss 1 pair of outliers. with the loop, it tends to find lots of supposed outliers very confidently, but by eye, it tends to omit clusters
   			#while(pval<pvalSet){
   				gt=outliers::grubbs.test(dists,type=20)
@@ -74,6 +83,10 @@ findSpatialOutliers=function(pres,
   				#cot=chisq.out.test(dists,variance = var(dists),opposite = FALSE)
   				(pval=gt$p.value)
   				# conservative way to toss outliers. this checks whether the single largest distance is an outlier. this is repeated until no more outliers are found
+  				if(is.na(pval)) {
+      			warning('p-value for grubbs test checking for pairs of outliers was NA. sample size is too small to implement the test')
+      			break
+      	}
   				if(gt$p.value<pvalSet){
   					toss=utils::tail(order(dists),2)
   					# IDs in the original data frame
@@ -89,16 +102,32 @@ findSpatialOutliers=function(pres,
     } 
   } # end grubbs
   
-  if(any(method=='iqr')) sp.toss.id=.iqrOutlier(dists)
+  if(any(method=='iqr')) {
+  	dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
+  	sp.toss.id=.iqrOutlier(dists)
+  }
   
   if(any(method=='dixon')){
-    # why don't i have to set the p-value for this?
-    dt=outliers::dixon.test(dists2,type=0,two.sided = FALSE)
+  	if(length(pres.inliers)<3 | length(pres.inliers)>30 ){
+  		warning('dixon test only applies to sample sizes between [3,30]. skipping this taxon')
+    	return(sp.toss.id)
+  	}
+    dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
+    if(length(unique(dists))==1) {
+    	warning('all records are the same distance from the spatial centroid so outliers cannot be detected. maybe your records come from gridded data. skipping this taxon')
+    	return(sp.toss.id)
+    }
+    dt=outliers::dixon.test(dists,type=0,two.sided = FALSE)
     #cot=chisq.out.test(dists,variance = var(dists),opposite = FALSE)
     if(dt$p.value<pvalSet) sp.toss.id=which.max(dists)
   }
   
   if(any(method=='rosner')){
+    dists=.presPercentile(pres.inliers,percent=NULL)[[1]]$dist.from.centroid
+    if(kRosner <= length(dists)) {
+    	warning('kRosner must be an integer less than the number of presence records, skipping this taxon')
+    	return(sp.toss.id)
+    }
     rt=EnvStats::rosnerTest(dists,kRosner,alpha=pvalSet)
     if(any(rt$all.stats$Outlier)) sp.toss.id=utils::tail(order(dists),kRosner)
   }

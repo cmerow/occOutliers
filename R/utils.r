@@ -37,7 +37,7 @@
     id <- factor(rep("a", nrow(as.data.frame(xy))))
   }
   
-  if (min(table(id)) < 5) stop("At least 5 relocations are required to fit an home range")
+  if (min(table(id)) < 4) stop("must have 4 records to proceed")
   id <- factor(id)
   xy <- as.data.frame(sp::coordinates(xy))
   r <- split(xy, id)
