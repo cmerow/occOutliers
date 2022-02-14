@@ -24,7 +24,7 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 mc.cores=1
 ```
 
-# Introduction 
+<!-- # Introduction  -->
 
 ```{r}
 library(occOutliers)
@@ -108,39 +108,37 @@ presOut3=findOutlyingPoints(pres=myPres3DF,
                            pval=1e-3)
 plotOutliers(presOut3,shpToPlot = world.shp)
 ```
-```{r}
 
-```
 
-In this case, because there are a cluster of presences in North America, using a lower p-value helps to detect them. 
+<!-- In this case, because there are a cluster of presences in North America, using a lower p-value helps to detect them.  -->
 
-```{r,fig.width=7, fig.height=7, dpi=300,out.width='80%'}
-myPres4=read.csv(system.file('extdata/SpeciesCSVs/Aster_tataricus.csv',package='occOutliers'))
-myPres4=myPres4[complete.cases(myPres4),]
-sp::coordinates(myPres4)=c(1,2)
-myPres4DF=sp::SpatialPointsDataFrame(myPres4,data.frame(raster::extract(myEnv,myPres4)))
-presOut4=findOutlyingPoints(pres=myPres4DF,
-                           spOutliers=TRUE,
-                           envOutliers=TRUE,
-                           pval=1e-3) # note the lower value here
-plotOutliers(presOut4,shpToPlot = world.shp)
-```
-However, lowering the p-value cannot just be done arbitarily. In this case, the biased sampling in Europe places the geographic centroid there, making the more poorly sampled parts of Asia appear as outliers. Hence some visual inspection should be used to assess results; this issue occurs typically when extreme sampling bias is present. A lower p-value of 1e-6 helps this situation, although it's unclear whether the detected outliers still reflect undersampling. If one suspects that they do, it would be preferrable to spatially thin the presences (e.g., using the `spThin` package) to remove some sampling bias before using outlier detection. 
+<!-- ```{r,fig.width=7, fig.height=7, dpi=300,out.width='80%'} -->
+<!-- myPres4=read.csv(system.file('extdata/SpeciesCSVs/Aster_tataricus.csv',package='occOutliers')) -->
+<!-- myPres4=myPres4[complete.cases(myPres4),] -->
+<!-- sp::coordinates(myPres4)=c(1,2) -->
+<!-- myPres4DF=sp::SpatialPointsDataFrame(myPres4,data.frame(raster::extract(myEnv,myPres4))) -->
+<!-- presOut4=findOutlyingPoints(pres=myPres4DF, -->
+<!--                            spOutliers=TRUE, -->
+<!--                            envOutliers=TRUE, -->
+<!--                            pval=1e-3) # note the lower value here -->
+<!-- plotOutliers(presOut4,shpToPlot = world.shp) -->
+<!-- ``` -->
+<!-- However, lowering the p-value cannot just be done arbitarily. In this case, the biased sampling in Europe places the geographic centroid there, making the more poorly sampled parts of Asia appear as outliers. Hence some visual inspection should be used to assess results; this issue occurs typically when extreme sampling bias is present. A lower p-value of 1e-6 helps this situation, although it's unclear whether the detected outliers still reflect undersampling. If one suspects that they do, it would be preferrable to spatially thin the presences (e.g., using the `spThin` package) to remove some sampling bias before using outlier detection.  -->
 
-```{r,fig.width=6, fig.height=6, dpi=300,out.width='80%'}
-myPres5=read.csv(system.file('extdata/SpeciesCSVs/Betula_pendula.csv',package='occOutliers'))
-myPres5=myPres5[complete.cases(myPres5),]
-sp::coordinates(myPres5)=c(1,2)
-myPres5DF=sp::SpatialPointsDataFrame(myPres5,data.frame(raster::extract(myEnv,myPres5)))
-presOut5=findOutlyingPoints(pres=myPres5DF,
-                           spOutliers=TRUE,
-                           envOutliers=TRUE,
-                           pval=1e-3) # note the lower value here
-plotOutliers(presOut5,shpToPlot = world.shp)
-presOut5.1=findOutlyingPoints(pres=myPres5DF,
-                           spOutliers=TRUE,
-                           envOutliers=TRUE,
-                           pval=1e-6) # note the lower value here
-plotOutliers(presOut5.1,shpToPlot = world.shp)
-```
+<!-- ```{r,fig.width=6, fig.height=6, dpi=300,out.width='80%'} -->
+<!-- myPres5=read.csv(system.file('extdata/SpeciesCSVs/Betula_pendula.csv',package='occOutliers')) -->
+<!-- myPres5=myPres5[complete.cases(myPres5),] -->
+<!-- sp::coordinates(myPres5)=c(1,2) -->
+<!-- myPres5DF=sp::SpatialPointsDataFrame(myPres5,data.frame(raster::extract(myEnv,myPres5))) -->
+<!-- presOut5=findOutlyingPoints(pres=myPres5DF, -->
+<!--                            spOutliers=TRUE, -->
+<!--                            envOutliers=TRUE, -->
+<!--                            pval=1e-3) # note the lower value here -->
+<!-- plotOutliers(presOut5,shpToPlot = world.shp) -->
+<!-- presOut5.1=findOutlyingPoints(pres=myPres5DF, -->
+<!--                            spOutliers=TRUE, -->
+<!--                            envOutliers=TRUE, -->
+<!--                            pval=1e-6) # note the lower value here -->
+<!-- plotOutliers(presOut5.1,shpToPlot = world.shp) -->
+<!-- ``` -->
 

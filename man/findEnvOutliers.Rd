@@ -4,7 +4,13 @@
 \alias{findEnvOutliers}
 \title{Find outlying occurrence data in environmental space}
 \usage{
-findEnvOutliers(pres, pvalSet = 1e-05, method = "grubbs", checkPairs = TRUE)
+findEnvOutliers(
+  pres,
+  pvalSet = 1e-05,
+  method = "grubbs",
+  checkPairs = TRUE,
+  kRosner = NULL
+)
 }
 \arguments{
 \item{pres}{a `SpatialPoints` or `SpatialPointsDataFrame` object describing the locations of species records. A `SpatialPointsDataFrame` containing the values of environmental variables to be used must be supplied if `envOutliers=TRUE`}
@@ -13,7 +19,9 @@ findEnvOutliers(pres, pvalSet = 1e-05, method = "grubbs", checkPairs = TRUE)
 
 \item{method}{character; options are 'iqr', 'grubbs', 'dixon', 'rosner'}
 
-\item{checkPairs}{logical; check for a single pair of outliers. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye.}
+\item{checkPairs}{logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye. The value has no effect unless `method='grubbs'`.}
+
+\item{kRosner}{integer between 1 and 10. Determines the number of outliers suspected with a Rosner test. The value has no effect unless `method='rosner'`.# @keywords}
 }
 \value{
 Returns the indices of environmental outliers

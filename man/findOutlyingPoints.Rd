@@ -11,6 +11,7 @@ findOutlyingPoints(
   method = "grubbs",
   pval = 1e-05,
   checkPairs = TRUE,
+  kRosner = 3,
   verbose = TRUE
 )
 }
@@ -21,11 +22,13 @@ findOutlyingPoints(
 
 \item{envOutliers}{logical; perform environmental outlier analysis}
 
-\item{method}{character; options are 'iqr', 'grubbs', 'dixon', 'rosner'}
+\item{method}{character; options are 'iqr', 'grubbs', 'dixon', 'rosner'. Only a single value can be used; if mutliple tests are desired, call `findOuliers` multiple times specifying different methods.}
 
 \item{pval}{user-specified p-value for assessing the significance of Grubbs test statistic.}
 
-\item{checkPairs}{logical; check for a single pair of outliers. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye.}
+\item{checkPairs}{logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye. The value has no effect unless `method='grubbs'`.}
+
+\item{kRosner}{integer between 1 and 10. Determines the number of outliers suspected with a Rosner test. The value has no effect unless `method='rosner'`.}
 
 \item{verbose}{logical; print messages}
 }

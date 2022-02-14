@@ -51,7 +51,8 @@ plotOutliers=function(pres,env=NULL,outlierNames=c('spOutlier','envOutlier'),
   
   if(length(outlierNames)==1){ toss=which(pres@data[,outlierNames])
   } else { toss=which(apply(pres@data[,outlierNames],1,any))}
-  if(length(toss)>1) pres0=pres[-toss,]
+  if(length(toss)>1) { pres0=pres[-toss,]
+  } else {pres0=pres}
   if(!is.null(env)){
     env.bg=raster::crop(env[[1]],pe)
     raster::plot(env.bg,col='grey50',legend=FALSE)

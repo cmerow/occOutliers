@@ -8,7 +8,8 @@ findSpatialOutliers(
   pres,
   pvalSet = 1e-05,
   method = "grubbs",
-  checkPairs = TRUE
+  checkPairs = TRUE,
+  kRosner = NULL
 )
 }
 \arguments{
@@ -18,7 +19,9 @@ findSpatialOutliers(
 
 \item{method}{character; options are 'iqr', 'grubbs', 'dixon', 'rosner'}
 
-\item{checkPairs}{logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye.}
+\item{checkPairs}{logical; check for a single pair of outliers using the Grubbs test. This can only be performed for sample sizes <30. Only a single test is used because repeating it tends to throw out more points than seem reasonable, by eye. The value has no effect unless `method='grubbs'`.}
+
+\item{kRosner}{integer between 1 and 10. Determines the number of outliers suspected with a Rosner test. The value has no effect unless `method='rosner'`.}
 }
 \value{
 Returns the indices of spatial outliers
