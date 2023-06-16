@@ -50,34 +50,40 @@ findOutlyingPoints=function(pres,
                             checkPairs=TRUE,
                             kRosner=3,
                             verbose=TRUE){
-
+  
   #  for testing
   #  pres=myPresDF;  verbose=T
   #  envOutliers=T; spOutliers=T;  pval=1e-5; 
-
+  
   if(!any(class(pres)==c('SpatialPoints','SpatialPointsDataFrame'))) stop('Please make your presence data a SpatialPoints or SpatialPointsDataFrame object and try again')
   
   if(spOutliers) { 
-  	sp.toss.id=findSpatialOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,
-  	                               method=method,kRosner=kRosner)
-  	if(verbose) print(paste0(length(sp.toss.id),' geographic outlier(s) found with method ',method))
+    sp.toss.id=findSpatialOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,
+                                   method=method,kRosner=kRosner)
+    if(verbose) print(paste0(length(sp.toss.id),' geographic outlier(s) found with method ',method))
   } else {sp.toss.id=NULL}
   
   if(envOutliers) { 
-  	env.toss.id=findEnvOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,
-  	                            method=method,kRosner=kRosner)
-  	pres$envOutlier=FALSE
-  	pres$envOutlier[env.toss.id]=TRUE
-  	if(verbose) print(paste0(length(env.toss.id),' environmental outlier(s) found with method ',method))
-  	if(nrow(pres)-length(env.toss.id) < 2){
-  		warning(paste0('pretty much all the presences came up as environmental outliers. The only case Ive seen this in was when there were two obvious outliers and all the other presences had the same exact environment. In any case, I cant find any outliers.'))
-  	}
+    env.toss.id=findEnvOutliers(pres=pres,pvalSet=pval,checkPairs=checkPairs,
+                                method=method,kRosner=kRosner)
+    pres$envOutlier=FALSE
+    pres$envOutlier[env.toss.id]=TRUE
+    if(verbose) print(paste0(length(env.toss.id),' environmental outlier(s) found with method ',method))
+    if(nrow(pres)-length(env.toss.id) < 2){
+      warning(paste0('pretty much all the presences came up as environmental outliers. The only case Ive seen this in was when there were two obvious outliers and all the other presences had the same exact environment. In any case, I cant find any outliers.'))
+    }
   }
-
+  #Pep added
   if(spOutliers) {
+    if (class(pres)==c('SpatialPoints')) {
+      pres  = sp::SpatialPointsDataFrame(pres,
+                                         data.frame(spOutlier= rep(F,length(pres)))
+      )
+      
+    }
     pres$spOutlier=FALSE
     pres$spOutlier[sp.toss.id]=TRUE
   }
-
+  
   return(pres)
 }
